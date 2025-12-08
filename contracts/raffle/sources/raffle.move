@@ -2,34 +2,36 @@ module raffle::raffle;
 
 use sui::coin::Coin;
 use sui::sui::SUI;
-use raffle::ticket::Ticket;
 
 const ERR_RAFFLE_CLOSED: u64 = 1;
 const ERR_INSUFFICIENT_FOUND: u64 = 2;
+const ERR_EMPTY_POT: u64 = 3;
 
 public struct Raffle has key, store {
     id: UID,
     owner: address,
     title: vector<u8>,
-    ticket_price: u64, // Price as MIST
+    ticket_price: u64,
+    tickets: vector<ID>,
     winner_ticket: option::Option<ID>,
     pot: vector<Coin<SUI>>
 }
 
-public fun create(title: vector<u8>, ticket_price: u64, ctx: &mut TxContext): Raffle {
+public fun create(title: vector<u8>, ticket_price: u64, ctx: &mut TxContext) {
     let raffle = Raffle {
         id: object::new(ctx),
         owner: tx_context::sender(ctx),
         title,
         ticket_price,
+        tickets: vector::empty(),
         winner_ticket: option::none<ID>(),
         pot: vector::empty<Coin<SUI>>()
     };
 
-    return raffle
+    transfer::public_transfer(raffle, tx_context::sender(ctx))
 }
 
-public fun buy_ticket(raffle: &mut Raffle, mut payment: Coin<SUI>, ctx: &mut TxContext): Ticket {
+public fun buy_ticket(raffle: &mut Raffle, mut payment: Coin<SUI>, ctx: &mut TxContext) {
     // validate if the raffle is opened
     assert!(option::is_none(&raffle.winner_ticket), ERR_RAFFLE_CLOSED);
 
@@ -46,5 +48,7 @@ public fun buy_ticket(raffle: &mut Raffle, mut payment: Coin<SUI>, ctx: &mut TxC
     transfer::public_transfer(payment, sender_address);
 
     let ticket = raffle::ticket::create(ctx, object::id(raffle), sender_address);
-    return ticket
+    
+    vector::push_back(&mut raffle.tickets, object::id(&ticket));
+    transfer::public_transfer(ticket, sender_address);
 }

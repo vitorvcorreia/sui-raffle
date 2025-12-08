@@ -1,6 +1,6 @@
 module raffle::ticket;
 
-public struct Ticket has key {
+public struct Ticket has key, store {
     id: UID,
     raffle_id: ID,
     owner: address

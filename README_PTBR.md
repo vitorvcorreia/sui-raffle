@@ -68,6 +68,53 @@ Não são criados objetos ou NFTs de ticket para manter a implementação simple
 
 ---
 
+## Executando o projeto
+
+### 1. Publicar o Package
+
+Publique o package Move da Raffle na rede Sui:
+
+sui client publish
+
+Isso irá publicar o package e retornar o `PACKAGE_ID`, que será usado nos próximos passos.
+
+---
+
+### 2. Criar uma Rifa
+
+Crie uma nova rifa informando o título e o preço do ticket:
+
+sui client call --package [PACKAGE_ID] --module raffle --function create --args [RAFFLE_TITLE] [TICKET_PRICE_MINT]
+
+- RAFFLE_TITLE: Nome da rifa (string)
+- TICKET_PRICE_MINT: Preço do ticket em MIST (u64)
+
+---
+
+### 3. Comprar Tickets
+
+Usuários podem comprar tickets da rifa usando uma moeda SUI:
+
+sui client call --package [PACKAGE_ID] --module raffle --function buy_ticket --args [RAFFLE_ID] [COIN_ID] --gas [GAS_COIN_ID] --gas-budget 10000000
+
+- RAFFLE_ID: ID do objeto da rifa
+- COIN_ID: Moeda SUI usada para pagar o ticket
+- GAS_COIN_ID: Moeda SUI usada para pagar o gas (deve ser diferente da COIN_ID)
+
+---
+
+### 4. Encerrar a Rifa
+
+O dono da rifa pode encerrá-la, sortear o ganhador e distribuir o prêmio:
+
+sui client call --package [PACKAGE_ID] --module raffle --function end --args [RAFFLE_ID] [RANDOM] --gas [GAS_COIN_ID] --gas-budget 10000000
+
+- RAFFLE_ID: ID do objeto da rifa
+- RANDOM: Singleton de Random da Sui (0x000000000000000000000000000000000000008)
+- GAS_COIN_ID: Moeda SUI usada para pagar o gas
+
+---
+
 ## 📚 Aviso
 
 Este projeto foi desenvolvido como parte de um **sui bootcamp** e **não está pronto para produção**.  

@@ -65,6 +65,59 @@ No Ticket NFT or object is created to keep the implementation simple and cost-ef
 - Ticket NFTs for transferability
 - Automatic raffle closing based on time or epoch
 
+## Runnig the project 
+
+### 1. Publish the Package
+
+Publish your Raffle Move package to the Sui network:
+
+```bash
+sui client publish
+```
+
+This will deploy the package and give you the `PACKAGE_ID` for the next steps.
+
+---
+
+### 2. Create a Raffle
+
+Create a new raffle with a title and ticket price:
+
+```bash
+sui client call --package [PACKAGE_ID] --module raffle --function create --args [RAFFLE_TITLE] [TICKET_PRICE_MINT]
+```
+
+- RAFFLE_TITLE: Name of your raffle (string)
+- TICKET_PRICE_MINT: Ticket price in MIST (u64)
+
+---
+
+### 3. Buy Tickets
+
+Users can buy tickets for the raffle using a SUI coin:
+
+```bash
+sui client call --package [PACKAGE_ID] --module raffle --function buy_ticket --args [RAFFLE_ID] [COIN_ID] --gas [GAS_COIN_ID] --gas-budget 10000000
+```
+
+- RAFFLE_ID: ID of the raffle object
+- COIN_ID: SUI coin used to pay for the ticket
+- GAS_COIN_ID: SUI coin used to pay for gas (must be different from COIN_ID)
+
+---
+
+### 4. End the Raffle
+
+The raffle owner can close the raffle, draw a winner, and distribute the pot:
+
+```bash
+sui client call --package [PACKAGE_ID] --module raffle --function end --args [RAFFLE_ID] [RANDOM] --gas [GAS_COIN_ID] --gas-budget 10000000
+```
+
+- RAFFLE_ID: ID of the raffle object
+- RANDOM: Sui Random singleton (0x000000000000000000000000000000000000008)
+- GAS_COIN_ID: SUI coin used to pay for gas
+
 ---
 
 ## 📚 Disclaimer
